@@ -1,0 +1,59 @@
+// Here are all the commands for making ntuple from nmea format log
+
+//Description of nmea format : below page is one of example
+https://receiverhelp.trimble.com/alloy-gnss/en-us/NMEA-0183messages_MessageOverview.html
+//My script only check fixed position, orbit of each satellite and c/n[0], but other info. is included in nmea data.
+
+
+
+// Remark //
+
+// information about date isnt contained in nmea data,
+// so we should add date by ourselves,
+// but my script isnt considered it.
+
+// position fixed data is outputed as "pos***"
+// but i dont prepare script that they converted to ntuple.
+
+
+
+
+//Usage // 
+
+
+//Environment
+//Assuming setup when kamioka cumputer system
+//I use root_v5.34.38, but other version seems to work 
+> source /usr/local/sklib_gcc8/root_v5.34.38/bin/thisroot.sh
+
+
+//Go to working directory
+// and build the executables
+> cd **/nmeaplot/
+> g++ -o conv_nmea conv_nmea.cc
+> g++ -o conv_satfile conv_satfile.cc
+> g++ `root-config --cflags --libs` -o make_tree make_tree.cc
+
+
+
+//Convert nmea file and make ntuple
+> ./nmeaplot.sh (input nmea file) (output direcroty)
+
+
+//Output ntuple file "tree.root"
+
+//ntuple desctiption
+sat 
+    0 : GPS (SBAS also contain)
+    1 : GLONASS
+    2 : Galileo
+    3 : BeiDou
+    4 : QZSS
+
+fix 
+    0 : tracked, but dont used to positon fix
+    1 : used to position fix
+
+e.g.
+tree->Draw("elev:azim:cn0","","colz") // correlation b/w sat. orbit and c/n0
+tree->Draw("t","fix==1 && sat == 0") //# of GPS used to position fixed
